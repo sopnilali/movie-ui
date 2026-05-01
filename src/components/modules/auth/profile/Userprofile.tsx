@@ -2,6 +2,7 @@
 import { selectCurrentToken } from "@/components/redux/features/auth/authSlice";
 import { usePurchaseHistoryQuery } from "@/components/redux/features/payment/paymentApi";
 import {
+  useChangePasswordMutation,
   useGetUserQuery,
   useUpdateUserMutation,
 } from "@/components/redux/features/user/userApi";
@@ -36,6 +37,12 @@ interface FormData {
   contactNumber: string;
 }
 
+interface PasswordFormData {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
 const UserProfile = () => {
   const token = useAppSelector(selectCurrentToken);
   let userInfo;
@@ -47,6 +54,7 @@ const UserProfile = () => {
 
   const { data, isLoading } = useGetUserQuery(userId);
   const [updateUser] = useUpdateUserMutation();
+  const [changePassword] = useChangePasswordMutation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState<"profile" | "watchlist">(
@@ -60,6 +68,11 @@ const UserProfile = () => {
   });
   const [previewImage, setPreviewImage] = useState<string>("");
   const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [passwordData, setPasswordData] = useState<PasswordFormData>({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
   const [user, setUser] = useState<UserData>({
     name: "John Doe",
@@ -109,6 +122,14 @@ const UserProfile = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPasswordData((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -169,6 +190,42 @@ const UserProfile = () => {
   const totalRented = purchaseHistory?.data?.filter(
     (item: any) => item?.purchaseStatus === "RENTED"
   );
+
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const toastId = toast.loading("Changing password...");
+
+    try {
+      if (!passwordData.oldPassword || !passwordData.newPassword) {
+        throw new Error("Old password and new password are required");
+      }
+
+      if (passwordData.newPassword.length < 6) {
+        throw new Error("New password must be at least 6 characters");
+      }
+
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        throw new Error("Confirm password does not match");
+      }
+
+      await changePassword({
+        oldPassword: passwordData.oldPassword,
+        newPassword: passwordData.newPassword,
+      }).unwrap();
+
+      setPasswordData({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      toast.success("Password changed successfully!", { id: toastId });
+    } catch (error: any) {
+      toast.error(
+        error?.data?.message || error?.message || "Failed to change password",
+        { id: toastId }
+      );
+    }
+  };
 
   if (isLoading) {
     return <LoadingPage />;
@@ -405,6 +462,73 @@ const UserProfile = () => {
                     Edit Profile
                   </button>
                 )}
+              </div>
+            </form>
+            <form
+              onSubmit={handlePasswordUpdate}
+              className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-6"
+            >
+              <h3 className="text-xl font-semibold text-white">Security</h3>
+              <p className="mt-1 text-sm text-gray-400">
+                Change your account password here.
+              </p>
+
+              <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Old Password
+                  </label>
+                  <input
+                    type="password"
+                    name="oldPassword"
+                    value={passwordData.oldPassword}
+                    onChange={handlePasswordChange}
+                    className="w-full px-4 py-3 text-white bg-white/10 border border-white/10 rounded-xl focus:border-gray-500 outline-none transition-all"
+                    placeholder="Enter old password"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={passwordData.newPassword}
+                    onChange={handlePasswordChange}
+                    className="w-full px-4 py-3 text-white bg-white/10 border border-white/10 rounded-xl focus:border-gray-500 outline-none transition-all"
+                    placeholder="Enter new password"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-300">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={passwordData.confirmPassword}
+                    onChange={handlePasswordChange}
+                    className="w-full px-4 py-3 text-white bg-white/10 border border-white/10 rounded-xl focus:border-gray-500 outline-none transition-all"
+                    placeholder="Confirm new password"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={
+                    !passwordData.newPassword.trim() ||
+                    !passwordData.confirmPassword.trim() ||
+                    passwordData.newPassword !== passwordData.confirmPassword
+                  }
+                  className="px-6 py-2.5 text-white bg-gradient-to-r cursor-pointer from-purple-500 to-pink-500 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Update Password
+                </button>
               </div>
             </form>
             {/* {activeTab === "profile" ? (
