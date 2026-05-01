@@ -1,6 +1,5 @@
 import { verifyToken } from "@/utils/verifyToken";
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 
 type Role = keyof typeof roleBasedPrivateRoutes;
 
@@ -27,12 +26,7 @@ const roleBasedPrivateRoutes = {
   ],
 };
 
-// const roleBasedPrivateRoutes = {
-//   USER: [/^\/dashboard/, /^\/profile/],
-//   ADMIN: [/^\/dashboard/, /^\/profile/],
-// };
-
-export const middleware = async (request: NextRequest) => {
+export const proxy = async (request: NextRequest) => {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("accessToken")?.value;
   let userInfo = null;
@@ -71,7 +65,3 @@ export const config = {
     "/profile/:path*",
   ],
 };
-
-// export const config = {
-//   matcher: ["/profile", "/dashboard", "/dashboard/:page*"],
-// };
