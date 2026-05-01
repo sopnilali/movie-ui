@@ -11,13 +11,6 @@ const userApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["user"],
     }),
-    login: builder.mutation({
-      query: (userInfo) => ({
-        url: "/auth/login",
-        method: "POST",
-        body: userInfo,
-      }),
-    }),
     getAllUser: builder.query({
       query: (args) => {
         const params = new URLSearchParams();
@@ -63,7 +56,6 @@ const userApi = baseApi.injectEndpoints({
 
 export const {
   useGetAllUserQuery,
-  useLoginMutation,
   useGetUserQuery,
   useCreateUserMutation,
   useUpdateUserMutation,

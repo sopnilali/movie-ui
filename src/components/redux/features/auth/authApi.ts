@@ -4,6 +4,7 @@ import { baseApi } from "../../api/baseApi";
 
 
 const authApi = baseApi.injectEndpoints({
+    overrideExisting: true,
     endpoints: (builder) => ({
         login: builder.mutation({
             query: (userInfo) => ({

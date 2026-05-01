@@ -48,7 +48,7 @@ const userRoutes = [
   },
   {
     name: "Purchase History",
-    link: "/dashboard/purchase-history",
+    link: "/dashboard/purchasehistory",
     icon: <MdReceipt />,
   },
   {
