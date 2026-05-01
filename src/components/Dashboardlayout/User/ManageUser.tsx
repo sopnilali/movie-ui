@@ -373,47 +373,90 @@ const ManageUser = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-lg z-50 mx-2"
+              className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md p-3 md:p-6"
             >
               <motion.div
-                initial={{ scale: 0.95, y: 20 }}
+                initial={{ scale: 0.96, y: 18 }}
                 animate={{ scale: 1, y: 0 }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl bg-[#000a3a] border border-[#1a2d6d] rounded-xl overflow-hidden"
+                transition={{ duration: 0.25 }}
+                className="fixed top-1/2 left-1/2 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-[#0b1444] to-[#060a2d] shadow-[0_25px_80px_rgba(0,0,0,0.55)]"
               >
                 <form
                   onSubmit={handleAddUserSubmit(onSubmitAddUser)}
-                  className="p-8 max-h-[90vh] overflow-y-auto"
+                  className="max-h-[90vh] overflow-y-auto p-5 md:p-8 space-y-6"
                 >
-                  <h2 className="lg:text-2xl text-xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                    Add New User
-                  </h2>
+                  <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-5">
+                    <div>
+                      <p className="mb-1 text-xs font-medium uppercase tracking-[0.22em] text-blue-300/80">
+                        User Management
+                      </p>
+                      <h2 className="text-xl md:text-3xl font-semibold bg-gradient-to-r from-blue-300 via-cyan-300 to-purple-300 bg-clip-text text-transparent">
+                        Add New User
+                      </h2>
+                    </div>
+                    <p className="rounded-full border border-blue-400/30 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-200">
+                      Professional mode
+                    </p>
+                  </div>
 
                   {/* Profile Photo Upload */}
-                  <div className="mb-6">
-                    <div className="border-2 border-dashed border-[#1a2d6d] rounded-xl p-4 text-center">
+                  <div className="rounded-2xl border border-white/10 bg-[#070d33]/80 p-5 md:p-6">
+                    <h3 className="mb-1 text-lg font-semibold text-white">
+                      Profile Photo
+                    </h3>
+                    <p className="mb-4 text-sm text-gray-400">
+                      Upload a clear photo for this user profile.
+                    </p>
+                    <div className="rounded-xl border border-dashed border-blue-400/30 bg-gradient-to-b from-[#00031b] to-[#050a2a] p-4 text-center">
                       {previewImage ? (
                         <div className="relative group">
                           <img
                             src={previewImage}
                             alt="Preview"
-                            className="w-full h-48 object-cover rounded-lg mb-4"
+                            className="h-52 w-full rounded-lg border border-white/10 object-cover"
                           />
+                          <p className="mt-3 text-xs text-gray-400">
+                            Preview ready. You can replace this image anytime.
+                          </p>
                           <button
                             type="button"
                             onClick={clearImage}
-                            className="absolute top-2 right-2 bg-red-500/80 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                            className="absolute right-2 top-2 rounded-full bg-red-500/85 px-2 py-1 text-sm text-white hover:bg-red-600 transition-colors"
                           >
-                            ✕
+                            Remove
                           </button>
                         </div>
                       ) : (
-                        <div className="space-y-4">
+                        <div className="space-y-4 py-4">
+                          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-blue-400/30 bg-blue-500/10">
+                            <svg
+                              className="h-6 w-6 text-blue-300"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.8"
+                                d="M3 15.75V18a2 2 0 002 2h14a2 2 0 002-2v-2.25M7.5 9L12 4.5m0 0L16.5 9M12 4.5V15"
+                              />
+                            </svg>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-200">
+                              Drag and drop image here
+                            </p>
+                            <p className="mt-1 text-xs text-gray-400">
+                              PNG, JPG up to 5MB
+                            </p>
+                          </div>
                           <button
                             type="button"
                             onClick={() => fileInputRef.current?.click()}
-                            className="bg-purple-600/20 text-purple-400 px-6 py-3 rounded-lg hover:bg-purple-600/30 transition-colors"
+                            className="rounded-lg border border-purple-400/30 bg-purple-600/20 px-6 py-3 text-purple-200 hover:bg-purple-600/30 transition-colors"
                           >
-                            Upload Profile Photo
+                            Browse Files
                           </button>
                           <input
                             type="file"
@@ -427,78 +470,103 @@ const ManageUser = () => {
                     </div>
                   </div>
 
-                  {/* Form Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="rounded-2xl border border-white/10 bg-[#070d33]/80 p-5 md:p-6">
+                    <h3 className="mb-1 text-lg font-semibold text-white">
+                      Basic Information
+                    </h3>
+                    <p className="mb-4 text-sm text-gray-400">
+                      Main identity and account credentials.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* First Row */}
-                    <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-xs uppercase tracking-wide text-gray-300">
+                        Full Name
+                      </label>
                       <input
                         {...registerAddUser("name", { required: true })}
                         placeholder="Full Name"
-                        className="w-full bg-[#00031b] px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        className="h-11 w-full rounded-lg border border-white/15 bg-[#00031b] px-4 text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                       />
                       {addUserErrors.name && (
-                        <p className="text-red-500">Name is required!</p>
+                        <p className="mt-1 text-sm text-red-400">Name is required!</p>
                       )}
                     </div>
 
-                    <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-xs uppercase tracking-wide text-gray-300">
+                        Email
+                      </label>
                       <input
                         {...registerAddUser("email", { required: true })}
                         type="email"
                         placeholder="Email"
-                        className="w-full bg-[#00031b] px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        className="h-11 w-full rounded-lg border border-white/15 bg-[#00031b] px-4 text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                       />
                       {addUserErrors.email && (
-                        <p className="text-red-500">Email is required!</p>
+                        <p className="mt-1 text-sm text-red-400">Email is required!</p>
                       )}
                     </div>
 
                     {/* Second Row */}
-                    <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-xs uppercase tracking-wide text-gray-300">
+                        Password
+                      </label>
                       <input
                         {...registerAddUser("password", { required: true })}
                         type="password"
-                        placeholder="Password"
-                        className="w-full bg-[#00031b] px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        placeholder="Set temporary password"
+                        className="h-11 w-full rounded-lg border border-white/15 bg-[#00031b] px-4 text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                       />
+                      <p className="mt-1 text-xs text-gray-400">
+                        This field is required for new account creation.
+                      </p>
                       {addUserErrors.password && (
-                        <p className="text-red-500">Password is required!</p>
+                        <p className="mt-1 text-sm text-red-400">Password is required!</p>
                       )}
                     </div>
 
-                    <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-xs uppercase tracking-wide text-gray-300">
+                        Contact Number
+                      </label>
                       <input
                         {...registerAddUser("contactNumber", {
                           required: true,
                         })}
                         placeholder="Contact Number"
-                        className="w-full bg-[#00031b] px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        className="h-11 w-full rounded-lg border border-white/15 bg-[#00031b] px-4 text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                       />
                       {addUserErrors.contactNumber && (
-                        <p className="text-red-500">
+                        <p className="mt-1 text-sm text-red-400">
                           Contact Number is required!
                         </p>
                       )}
                     </div>
 
                     {/* Third Row */}
-                    <div className="space-y-4">
+                    <div>
+                      <label className="mb-2 block text-xs uppercase tracking-wide text-gray-300">
+                        Role
+                      </label>
                       <select
                         {...registerAddUser("role", { required: true })}
-                        className="w-full bg-[#00031b] px-4 py-2 rounded-lg focus:ring-2 focus:ring-purple-500"
+                        className="h-11 w-full rounded-lg border border-white/15 bg-[#00031b] px-4 text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
                       >
                         <option value="">Select Role</option>
                         <option value="USER">User</option>
                         <option value="ADMIN">Admin</option>
                       </select>
                       {addUserErrors.role && (
-                        <p className="text-red-500">Role is required!</p>
+                        <p className="mt-1 text-sm text-red-400">Role is required!</p>
                       )}
                     </div>
                   </div>
+                  </div>
 
                   {/* Form Buttons */}
-                  <div className="mt-8 flex justify-end gap-4">
+                  <div className="sticky bottom-0 mt-8 flex justify-end gap-3 border-t border-white/10 bg-gradient-to-t from-[#060a2d] to-transparent pt-5">
                     <button
                       type="button"
                       onClick={() => {
@@ -506,13 +574,13 @@ const ManageUser = () => {
                         resetAddUser();
                         clearImage();
                       }}
-                      className="px-6 py-2 cursor-pointer rounded-lg hover:bg-gray-700 transition-colors"
+                      className="rounded-lg border border-white/15 bg-white/5 px-5 py-2 text-sm md:text-base text-white hover:bg-white/10 transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
-                      className=" text-sm lg:text-base bg-gradient-to-r from-blue-500 to-purple-500 cursor-pointer px-4 lg:px-6 py-2 rounded-lg transition-colors"
+                      className="rounded-lg bg-gradient-to-r from-blue-500 via-cyan-500 to-purple-500 px-5 py-2 text-sm md:text-base font-medium text-white shadow-lg shadow-blue-500/20 hover:opacity-90 transition-opacity"
                     >
                       Add User
                     </button>
