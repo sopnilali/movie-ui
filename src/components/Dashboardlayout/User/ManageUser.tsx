@@ -35,6 +35,9 @@ const ManageUser = () => {
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<"ALL" | "ADMIN" | "USER">("ALL");
+  const [statusFilter, setStatusFilter] = useState<"ALL" | "ACTIVE" | "INACTIVE">("ALL");
 
   // Add User Modal States
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -55,6 +58,20 @@ const ManageUser = () => {
   const [createUser] = useCreateUserMutation();
   const [deleteUser] = useDeleteUserMutation();
   const [updateUser] = useUpdateUserMutation();
+  const usersList = users?.data || [];
+
+  const filteredUsers = usersList.filter((item: User) => {
+    const matchesRole = roleFilter === "ALL" || item.role === roleFilter;
+    const matchesStatus = statusFilter === "ALL" || item.status === statusFilter;
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const matchesSearch =
+      !normalizedSearch ||
+      item.name.toLowerCase().includes(normalizedSearch) ||
+      item.email.toLowerCase().includes(normalizedSearch) ||
+      item.contactNumber.toLowerCase().includes(normalizedSearch);
+
+    return matchesRole && matchesStatus && matchesSearch;
+  });
 
   const totalPages = Math.ceil((users?.meta?.total || 0) / itemsPerPage);
 
@@ -178,16 +195,74 @@ const ManageUser = () => {
     <div className="min-h-screen bg-[#00031b]">
       <div className="max-w-full mx-auto">
         {/* Header Section */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="md:text-3xl text-xl font-bold text-white">
-            User Management
-          </h1>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white px-2 text-sm lg:text-base lg:px-6 py-2 rounded-lg transition-all"
-          >
-            Add User
-          </button>
+        <div className="mb-8 rounded-2xl border border-white/10 bg-gradient-to-r from-[#0b1444] to-[#060a2d] p-5 md:p-7">
+          <div className="flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <p className="mb-1 text-xs font-medium uppercase tracking-[0.22em] text-blue-300/80">
+                Admin Panel
+              </p>
+              <h1 className="md:text-3xl text-xl font-bold text-white">
+                User Management
+              </h1>
+              <p className="mt-1 text-sm text-gray-400">
+                Manage users, roles, status and profile access in one place.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-500 text-white px-3 text-sm lg:text-base lg:px-6 py-2 rounded-lg transition-all"
+            >
+              Add User
+            </button>
+          </div>
+
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+              <p className="text-sm text-gray-400">Total (Current Page)</p>
+              <p className="text-2xl font-semibold text-white">{usersList.length}</p>
+            </div>
+            <div className="rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
+              <p className="text-sm text-purple-200">Admins</p>
+              <p className="text-2xl font-semibold text-purple-300">
+                {usersList.filter((item: User) => item.role === "ADMIN").length}
+              </p>
+            </div>
+            <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-4">
+              <p className="text-sm text-green-200">Active</p>
+              <p className="text-2xl font-semibold text-green-300">
+                {usersList.filter((item: User) => item.status === "ACTIVE").length}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name, email, contact..."
+              className="h-11 rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+            />
+            <select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as "ALL" | "ADMIN" | "USER")}
+              className="h-11 rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+            >
+              <option value="ALL">All Roles</option>
+              <option value="ADMIN">ADMIN</option>
+              <option value="USER">USER</option>
+            </select>
+            <select
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as "ALL" | "ACTIVE" | "INACTIVE")
+              }
+              className="h-11 rounded-xl border border-white/15 bg-white/5 px-4 text-sm text-white outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20"
+            >
+              <option value="ALL">All Status</option>
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
+          </div>
         </div>
 
         {/* User Table */}
@@ -210,7 +285,7 @@ const ManageUser = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users?.data?.map((user: User) => (
+                  {filteredUsers.map((user: User) => (
                     <motion.tr
                       key={user.id}
                       initial={{ opacity: 0 }}
@@ -221,15 +296,24 @@ const ManageUser = () => {
                       <td className="px-6 py-4">{user.email}</td>
                       <td className="px-6 py-4">{user.contactNumber}</td>
                       <td className="px-6 py-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm border ${
+                        <select
+                          value={user.role}
+                          onChange={(e) =>
+                            handleRoleUpdate(user.id, e.target.value as "USER" | "ADMIN")
+                          }
+                          className={`px-3 py-1 rounded-full text-sm border bg-transparent ${
                             user.role === "ADMIN"
                               ? "border-purple-500/50 text-purple-400"
                               : "border-blue-500/50 text-blue-400"
                           }`}
                         >
-                          {user.role}
-                        </span>
+                          <option value="USER" className="bg-[#000a3a] text-blue-300">
+                            USER
+                          </option>
+                          <option value="ADMIN" className="bg-[#000a3a] text-purple-300">
+                            ADMIN
+                          </option>
+                        </select>
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -262,6 +346,11 @@ const ManageUser = () => {
                 </tbody>
               </table>
             </div>
+            {filteredUsers.length === 0 && (
+              <div className="py-10 text-center text-gray-400">
+                No users found for current filters.
+              </div>
+            )}
 
             {/* Pagination Controls */}
             <div className="flex justify-center items-center gap-2 py-4 bg-[#000a3a]">
